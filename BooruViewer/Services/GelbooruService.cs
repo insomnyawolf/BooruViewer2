@@ -37,7 +37,7 @@ namespace BooruViewer.Services
             var helper = new GelbooruPostQueryHelper()
             {
                 Tags = tagsClass,
-                Limit = 10,
+                Limit = 20,
                 Page = 0,
                 //Sort = new Sort()
                 //{

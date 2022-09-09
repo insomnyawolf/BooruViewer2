@@ -13,12 +13,21 @@
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
 		<ScopedCssEnabled>false</ScopedCssEnabled>
 
-        <!-- Display name -->
+		<!-- 
+		https://github.com/dotnet/maui/issues/6578#issuecomment-1112070431
+		thank you https://github.com/janseris you are a fucking genious
+		trimmed binaries fail for some reason on release
+		-->
+		<PublishTrimmed>False</PublishTrimmed>
+
+		<!-- Display name -->
         <ApplicationTitle>BooruViewer</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>xd.insomnyawolf.booruviewer</ApplicationId>
         <ApplicationIdGuid>47DCF303-6601-4CE2-845F-BC9C464BF740</ApplicationIdGuid>
+
+		
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -36,6 +45,14 @@
         <GenerateTestArtifacts>True</GenerateTestArtifacts>
         <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     </PropertyGroup>
+
+	<!--<PropertyGroup Condition="$(TargetFramework.Contains('-android')) and '$(Configuration)' == 'Release'">
+		<AndroidKeyStore>True</AndroidKeyStore>
+		<AndroidSigningKeyStore>C:\Users\inso\AppData\Local\Xamarin\Mono for Android\debug.keystore</AndroidSigningKeyStore>
+		<AndroidSigningKeyAlias>androiddebugkey</AndroidSigningKeyAlias>
+		<AndroidSigningKeyPass>pass:android</AndroidSigningKeyPass>
+		<AndroidSigningStorePass>pass:android</AndroidSigningStorePass>
+	</PropertyGroup>-->
 
     <ItemGroup>
         <!-- App Icon -->

@@ -3,23 +3,23 @@
 
 @inject GelbooruService GelbooruService
 
-<div class="search-block">
-    <div class="selected-box">
+<div>
+    <div>
         <!--Selected Tokens Here-->
         @for (int index = 0; index < SelectedValues.Count; index++)
         {
             var local_item = SelectedValues[index];
             var local_index = index;
-            <span class="selcted-item">
+            <span>
                 @local_item
-                <i class="ti ti-x color-red" @onclick="() => RemoveSelected(local_index)"></i>
+                <i class="ti ti-x delete-tag" @onclick="() => RemoveSelected(local_index)"></i>
             </span>
         }
     </div>
 
-    <input class="search-input fill-width" type="text" placeholder="type your search here" @bind="InputValue" @oninput="OnInputChange" />
+    <input type="text" placeholder="type your search here" @bind="InputValue" @oninput="OnInputChange" />
 
-    <div class="auto-suggestion-box">
+    <div>
         <!--PosibleOptionsHere-->
         @for (int index = 0; index < AutoSuggestionValues.Count; index++)
         {
@@ -27,7 +27,7 @@
             if (!item.IsHidden)
             {
                 <div>
-                    <button class="auto-suggestion-entry" @onclick="() => AddSelected(item.Value)">@item.Value</button>
+                    <button @onclick="() => AddSelected(item.Value)">@item.Value</button>
                 </div>
             }
         }

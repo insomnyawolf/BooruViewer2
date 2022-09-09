@@ -8,17 +8,16 @@
 @inject GelbooruService GelbooruService
 
 <div class="top-row ps-3 navbar navbar-dark sticky">
-    <div class="container-fluid">
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <!-- permanent part -->
+    <div class="toggle-nav-bar">
+        <i class="ti ti-menu-2" @onclick="ToggleNavMenu"></i>
     </div>
-
+    <!-- sometimes hidden part -->
     <div class="@NavMenuCssClass">
-        <nav class="flex-column">
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                    <span class="oi oi-home" aria-hidden="true"></span> BooruList
+        <nav>
+            <div>
+                <NavLink href="" Match="NavLinkMatch.All">
+                    <span aria-hidden="true"></span> BooruList
                 </NavLink>
             </div>
         </nav>
@@ -31,21 +30,18 @@
 
     private void ToggleNavMenu()
     {
-        if (NavMenuCssClass.Contains("collapse"))
+        if (NavMenuCssClass.Contains("collapsed"))
         {
-            NavMenuCssClass = NavMenuCssClass.Replace("collapse", "");
+            NavMenuCssClass = NavMenuCssClass.Replace("collapsed", "");
         }
         else
         {
-            NavMenuCssClass += " collapse";
+            NavMenuCssClass += " collapsed";
         }
     }
 
 
 }
-
-
-
 
 <div>
     @if (GelbooruService.LastPostResponse == null)
@@ -60,21 +56,23 @@
         }
         else
         {
-            <div id="content">
+            <div class="content">
                 @foreach (var item in GelbooruService.Posts)
                 {
                     <BooruPost Post="@item"></BooruPost>
                 }
 
             </div>
-            @*<div id="pagination">
-    <button @onclick="async() => { CurrentPage--; await LoadPosts();}" disabled="@PreviousPageAvailable()">
-    PreviousPage
-    </button>
-    <button @onclick="async() => { CurrentPage++; await LoadPosts();}" disabled="@NextPageAvailable()">
-    NextPage
-    </button>
-    </div>*@
+            @*
+                <div id="pagination">
+                    <button @onclick="async() => { CurrentPage--; await LoadPosts();}" disabled="@PreviousPageAvailable()">
+                    PreviousPage
+                    </button>
+                    <button @onclick="async() => { CurrentPage++; await LoadPosts();}" disabled="@NextPageAvailable()">
+                    NextPage
+                    </button>
+                </div>
+            *@
         }
     }
 </div>
