@@ -1,0 +1,120 @@
+﻿@using BooruApi.Models
+@using BooruViewer.Services
+
+@inject GelbooruService GelbooruService
+
+<div class="search-block">
+    <div class="selected-box">
+        <!--Selected Tokens Here-->
+        @for (int index = 0; index < SelectedValues.Count; index++)
+        {
+            var local_item = SelectedValues[index];
+            var local_index = index;
+            <span class="selcted-item">
+                @local_item
+                <i class="ti ti-x color-red" @onclick="() => RemoveSelected(local_index)"></i>
+            </span>
+        }
+    </div>
+
+    <input class="search-input fill-width" type="text" placeholder="type your search here" @bind="InputValue" @oninput="OnInputChange" />
+
+    <div class="auto-suggestion-box">
+        <!--PosibleOptionsHere-->
+        @for (int index = 0; index < AutoSuggestionValues.Count; index++)
+        {
+            var item = AutoSuggestionValues[index];
+            if (!item.IsHidden)
+            {
+                <div>
+                    <button class="auto-suggestion-entry" @onclick="() => AddSelected(item.Value)">@item.Value</button>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+
+@code {
+    // Demonstrates how a parent component can supply parameters
+    [Parameter]
+    public Action<List<string>> OnTokensChange { get; set; }
+
+    public List<string> SelectedValues { get; set; } = new List<string>();
+    public string InputValue { get; set; }
+    public List<AutoCompleteCache> AutoSuggestionValues { get; set; } = new List<AutoCompleteCache>();
+
+    public async Task OnInputChange(ChangeEventArgs e)
+    {
+        if (e.Value is not string value)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        if (value.Length < 3)
+        {
+            return;
+        }
+
+        var tags = await GetTagsAutocomplete(value);
+
+        FilterSuggestions(tags);
+
+        AutoSuggestionValues = tags;
+    }
+
+    public void FilterSuggestions(List<AutoCompleteCache> AutoCompleteCache)
+    {
+        for (int index = AutoCompleteCache.Count - 1; index > -1; index--)
+        {
+            var tag = AutoCompleteCache[index];
+
+            tag.IsHidden = false;
+
+            for (int subIndex = 0; subIndex < SelectedValues.Count; subIndex++)
+            {
+                if (tag.Value == SelectedValues[subIndex])
+                {
+                    tag.IsHidden = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    public async Task<List<AutoCompleteCache>> GetTagsAutocomplete(string partialInput)
+    {
+        var tags = await GelbooruService.GetTagsAutocomplete(partialInput);
+
+        return tags.Select(item => new AutoCompleteCache()
+            {
+                Value = item.Value,
+                IsHidden = false,
+            }).ToList();
+    }
+
+    public void AddSelected(string value)
+    {
+        SelectedValues.Add(value);
+        FilterSuggestions(AutoSuggestionValues);
+        OnTokensChange.Invoke(SelectedValues);
+    }
+
+    public void RemoveSelected(int index)
+    {
+        SelectedValues.RemoveAt(index);
+        FilterSuggestions(AutoSuggestionValues);
+        OnTokensChange.Invoke(SelectedValues);
+    }
+
+    public class AutoCompleteCache
+    {
+        public string Value { get; set; }
+        public bool IsHidden { get; set; }
+    }
+}

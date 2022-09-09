@@ -1,0 +1,136 @@
+﻿@page "/"
+@using BooruApi
+@using BooruApi.Models
+@using BooruViewer.Services
+@using BooruViewer.ServicesJs
+
+@inject JavascriptInteropHelper JavascriptInteropHelper
+@inject GelbooruService GelbooruService
+
+<div class="top-row ps-3 navbar navbar-dark sticky">
+    <div class="container-fluid">
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+
+    <div class="@NavMenuCssClass">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true"></span> BooruList
+                </NavLink>
+            </div>
+        </nav>
+        <TokenizedAutocompolete OnTokensChange="OnSearchChanged"></TokenizedAutocompolete>
+    </div>
+</div>
+
+@code {
+    private string NavMenuCssClass { get; set; } = "fill-width";
+
+    private void ToggleNavMenu()
+    {
+        if (NavMenuCssClass.Contains("collapse"))
+        {
+            NavMenuCssClass = NavMenuCssClass.Replace("collapse", "");
+        }
+        else
+        {
+            NavMenuCssClass += " collapse";
+        }
+    }
+
+
+}
+
+
+
+
+<div>
+    @if (GelbooruService.LastPostResponse == null)
+    {
+        <h1>Loading...</h1>
+    }
+    else
+    {
+        if (GelbooruService.LastPostResponse.Attributes.Count == 0)
+        {
+            <h1>"No Results"</h1>
+        }
+        else
+        {
+            <div id="content">
+                @foreach (var item in GelbooruService.Posts)
+                {
+                    <BooruPost Post="@item"></BooruPost>
+                }
+
+            </div>
+            @*<div id="pagination">
+    <button @onclick="async() => { CurrentPage--; await LoadPosts();}" disabled="@PreviousPageAvailable()">
+    PreviousPage
+    </button>
+    <button @onclick="async() => { CurrentPage++; await LoadPosts();}" disabled="@NextPageAvailable()">
+    NextPage
+    </button>
+    </div>*@
+        }
+    }
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        JavascriptInteropHelper.OnScroll += OnScroll;
+
+        await GelbooruService.OnInitializedAsync();
+    }
+
+    private async void OnScroll(int positionX, int currentScrollTopPosition)
+    {
+        var currentScrollBottomPosition = currentScrollTopPosition + JavascriptInteropHelper.Height;
+        var maxScrollHeight = await JavascriptInteropHelper.GetMaxScrollHeight();
+
+        // Phones Are Weird => I don't even know why this works
+        var loadNewPagePosition = maxScrollHeight - (JavascriptInteropHelper.Height);
+
+        if (currentScrollBottomPosition < loadNewPagePosition)
+        {
+            // Do nothing
+            return;
+        }
+
+        // Validations are made inside
+        if (!await GelbooruService.LoadNextPage())
+        {
+            // Does not need ui refreshing
+            return;
+        }
+
+        StateHasChanged();
+    }
+
+    private async void OnSearchChanged(List<string> tagsRaw)
+    {
+        var tags = new List<Tag>();
+
+        foreach (var item in tagsRaw)
+        {
+            tags.Add(new Tag()
+                {
+                    Value = item,
+                });
+        }
+
+        GelbooruService.GelbooruPostQueryHelper.Tags = tags;
+
+        await GelbooruService.NewSearch(GelbooruService.GelbooruPostQueryHelper);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        JavascriptInteropHelper.OnScroll -= OnScroll;
+    }
+}

@@ -1,0 +1,9 @@
+﻿using Foundation;
+
+namespace BooruViewer;
+
+[Register("AppDelegate")]
+public class AppDelegate : MauiUIApplicationDelegate
+{
+	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+}

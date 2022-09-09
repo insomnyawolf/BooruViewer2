@@ -1,0 +1,24 @@
+﻿@using BooruApi.Models
+<div class="post">
+    <span class="image-container">
+        <img src="@Post.PreviewUrl" />
+    </span>
+    <div>
+        <div>
+            Id: @Post.Id
+        </div>
+        <div>
+            <a href="@Post.FileUrl">FileUrl</a>
+        </div>
+        @foreach (var item in Post.Tags)
+        {
+            <span>@item </span>
+        }
+    </div>
+</div>
+
+@code {
+    // Demonstrates how a parent component can supply parameters
+    [Parameter]
+    public Post Post { get; set; }
+}
