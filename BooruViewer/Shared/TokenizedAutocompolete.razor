@@ -3,32 +3,30 @@
 
 @inject GelbooruService GelbooruService
 
-<div>
-    <div>
+<div class="tokenized-autocomplete search-settings">
+    <div class="selected-tags-box">
         <!--Selected Tokens Here-->
         @for (int index = 0; index < SelectedValues.Count; index++)
         {
             var local_item = SelectedValues[index];
             var local_index = index;
-            <span>
+            <div class="chip-accent">
                 @local_item
                 <i class="ti ti-x delete-tag" @onclick="() => RemoveSelected(local_index)"></i>
-            </span>
+            </div>
         }
     </div>
 
-    <input type="text" placeholder="type your search here" @bind="InputValue" @oninput="OnInputChange" />
+    <input class="tokenized-search-box" type="text" placeholder="type your search here" @bind="InputValue" @oninput="OnInputChange" />
 
-    <div>
+    <div class="autocomplete-tags">
         <!--PosibleOptionsHere-->
         @for (int index = 0; index < AutoSuggestionValues.Count; index++)
         {
             var item = AutoSuggestionValues[index];
             if (!item.IsHidden)
             {
-                <div>
-                    <button @onclick="() => AddSelected(item.Value)">@item.Value</button>
-                </div>
+                <div class="chip-accent" @onclick="() => AddSelected(item.Value)">@item.Value</div>
             }
         }
     </div>

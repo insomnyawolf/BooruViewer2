@@ -7,36 +7,39 @@
 @inject JavascriptInteropHelper JavascriptInteropHelper
 @inject GelbooruService GelbooruService
 
-<div class="top-row ps-3 navbar navbar-dark sticky">
+<div class="navbar sticky">
     <!-- permanent part -->
     <div class="toggle-nav-bar">
         <i class="ti ti-menu-2" @onclick="ToggleNavMenu"></i>
     </div>
+    <div class="flex-position-workaround"></div>
     <!-- sometimes hidden part -->
     <div class="@NavMenuCssClass">
-        <nav>
-            <div>
-                <NavLink href="" Match="NavLinkMatch.All">
-                    <span aria-hidden="true"></span> BooruList
-                </NavLink>
-            </div>
-        </nav>
-        <TokenizedAutocompolete OnTokensChange="OnSearchChanged"></TokenizedAutocompolete>
+        <div class="search-settings-box">
+            <!--search-settings-->
+            <TokenizedAutocompolete OnTokensChange="OnSearchChanged"></TokenizedAutocompolete>
+            <div class="search-settings">Rating Placeholder</div>
+            <div class="search-settings">image size placeholder</div>
+        </div>
+        <div>
+            <!--board selector-->
+            <!--maybe local favourites too?-->
+        </div>
     </div>
 </div>
 
 @code {
-    private string NavMenuCssClass { get; set; } = "fill-width";
+    private string NavMenuCssClass { get; set; } = "navbar-content";
 
     private void ToggleNavMenu()
     {
-        if (NavMenuCssClass.Contains("collapsed"))
+        if (NavMenuCssClass.Contains(" hidden"))
         {
-            NavMenuCssClass = NavMenuCssClass.Replace("collapsed", "");
+            NavMenuCssClass = NavMenuCssClass.Replace(" hidden", "");
         }
         else
         {
-            NavMenuCssClass += " collapsed";
+            NavMenuCssClass += " hidden";
         }
     }
 
@@ -64,15 +67,15 @@
 
             </div>
             @*
-                <div id="pagination">
-                    <button @onclick="async() => { CurrentPage--; await LoadPosts();}" disabled="@PreviousPageAvailable()">
-                    PreviousPage
-                    </button>
-                    <button @onclick="async() => { CurrentPage++; await LoadPosts();}" disabled="@NextPageAvailable()">
-                    NextPage
-                    </button>
-                </div>
-            *@
+    <div id="pagination">
+    <button @onclick="async() => { CurrentPage--; await LoadPosts();}" disabled="@PreviousPageAvailable()">
+    PreviousPage
+    </button>
+    <button @onclick="async() => { CurrentPage++; await LoadPosts();}" disabled="@NextPageAvailable()">
+    NextPage
+    </button>
+    </div>
+    *@
         }
     }
 </div>

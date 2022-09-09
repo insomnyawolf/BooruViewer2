@@ -3,6 +3,7 @@
     --accent: 37, 2, 209;
     --complimentary: 183, 65, 174;
     --text: 150, 150, 150;
+    --size-unit: 375px;
 }
 
 * {
@@ -13,6 +14,7 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background-color: rgba(var(--background), 1);
+    color: rgb(var(--text));
 }
 
 a, .btn-link {
@@ -58,6 +60,26 @@ a, .btn-link {
 
 /* https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
 .navbar {
+    width: 100%;
+    background-color: rgba(var(--complimentary), 0.5);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+.toggle-nav-bar {
+    order: 2;
+    font-size: xx-large;
+}
+
+.flex-position-workaround {
+    order: 1;
+}
+
+.navbar-content {
+    order: 0;
+    width: 100%;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -66,16 +88,9 @@ a, .btn-link {
     align-items: stretch;
     align-content: flex-start;
     gap: 5px;
-    width: 100%;
-    background-color: rgba(var(--complimentary), 0.2);
-    margin: 0;
 }
 
-.toggle-nav-bar {
-    align-self: flex-end;
-}
-
-.collapsed {
+.hidden {
     display: none;
 }
 
@@ -97,42 +112,78 @@ a, .btn-link {
 }
 
 .post {
-    border-radius: 5px;
-
-    /*max-width: 450px;
-    max-height: 450px;
-    min-height: 200px;
-    min-width: 200px;*/
-
-    width: 450px;
-    height: 450px;
-
+    border-radius: 2px;
+    width: var(--size-unit);
+    height: var(--size-unit);
     /*background: rgba(var(--accent), 0.15);
     color: rgba(var(--text), 1);*/
-
-
     /*background-color: transparent; unseen */
     /*background-image: url("paper.gif"); Set on each post as this value will change */
     background-position: center center;
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     /*background-origin: content-box; No entiendo xd */
     background-clip: border-box;
     background-attachment: scroll;
 }
 
-.image-test {
-    
+.search-settings-box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: normal;
+    row-gap: 5px;
 }
 
-
-.tags {
-    display: inline-block;
+.search-settings {
+    width: var(--size-unit);
+    background-color: rgba(0, 0, 0, 0.85);
+    /*placeholder*/
+    min-height: 100px;
 }
 
+.tokenized-autocomplete {
+}
 
-@media (min-width: 641px) {
+.selected-tags-box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: start;
+    align-content: start;
+    row-gap: 5px;
+    height: calc(var(--size-unit) / 3);
+    overflow-y: auto;
+}
+
+.chip-accent {
+    background-color: rgba(var(--accent), 0.8);
+    border-radius: 20px;
+    padding: 0.5em;
+}
+
+.tokenized-search-box{
+    width: 100%;
+}
+
+.autocomplete-tags {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: start;
+    align-content: start;
+    row-gap: 5px;
+    height: calc(var(--size-unit) / 3);
+    overflow-y: auto;
+}
+
+/*@media (min-width: 641px) {
     .navbar-toggler {
         display: none;
     }   
 }
+*/

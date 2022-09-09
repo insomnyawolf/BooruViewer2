@@ -1,5 +1,8 @@
 ﻿@using BooruApi.Models
-<div class="post" style="background-image: url(@Post.PreviewUrl);">
+@using System.Runtime.InteropServices
+@using System.Diagnostics
+
+<div class="post" style="background-image: url(@Post.PreviewUrl);" @onclick="() => OpenInBrowser(Post.FileUrl)">
     @*<div>
     <div>
     Id: @Post.Id
@@ -18,4 +21,9 @@
     // Demonstrates how a parent component can supply parameters
     [Parameter]
     public Post Post { get; set; }
+
+    public static async Task OpenInBrowser(string url)
+    {
+        await Browser.Default.OpenAsync(url);
+    }
 }
