@@ -1,5 +1,4 @@
-﻿using BooruViewer.Services;
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 
 namespace BooruViewer.ServicesJs
 {
@@ -7,24 +6,18 @@ namespace BooruViewer.ServicesJs
     {
         private DotNetObjectReference<JavascriptInteropHelper> ObjectReference { get; set; }
         private IJSRuntime JsRuntime { get; set; }
-        private GelbooruService GelbooruService { get; set; }
 
+        public Point Scroll { get; set; } = new Point();
         public delegate void OnScrollEvent(int positionX, int positionY);
         public event OnScrollEvent OnScroll;
-        public int ScrollX { get; private set; }
-        public int ScrollY { get; private set; }
 
+        public Point Size { get; set; } = new Point();
         public delegate void OnResizeEvent(int Width, int Height);
         public event OnResizeEvent OnResize;
-        public int Height { get; private set; }
-        public int Width { get; private set; }
 
-        public delegate void OnSearchChangedEvent(string value);
-
-        public JavascriptInteropHelper(IJSRuntime JsRuntime, GelbooruService GelbooruService)
+        public JavascriptInteropHelper(IJSRuntime JsRuntime)
         {
             this.JsRuntime = JsRuntime;
-            this.GelbooruService = GelbooruService;
             this.ObjectReference = DotNetObjectReference.Create(this);
 
             // setup class reference
@@ -35,26 +28,29 @@ namespace BooruViewer.ServicesJs
             viewSizeTask.ContinueWith((sizeTask) =>
             {
                 var size = sizeTask.Result;
-                Width = size.X;
-                Height = size.Y;
+                Size = size;
             });
         }
 
         [JSInvokable(nameof(onscroll))]
         public void onscroll(int positionX, int positionY)
         {
-            this.ScrollX = positionX;
-            this.ScrollY = positionY;
+            Scroll.X = positionX;
+            Scroll.Y = positionY;
             //Console.WriteLine("ScrollInfoService.OnScroll " + yValue);
             OnScroll?.Invoke(positionX, positionY);
+        }
+
+        public async Task SetScroll(Point scroll)
+        {
+            await JsRuntime.InvokeVoidAsync("setScroll", scroll.X, scroll.Y);
         }
 
         [JSInvokable(nameof(onresize))]
         public void onresize(int Width, int Height)
         {
-            this.Width = Width;
-            this.Height = Height;
-
+            Size.X = Width;
+            Size.Y = Height;
             //Console.WriteLine("ScrollInfoService.OnScroll " + yValue);
             OnResize?.Invoke(Width, Height);
         }
@@ -70,12 +66,6 @@ namespace BooruViewer.ServicesJs
         }
     }
 
-    public class AutocompleteResult
-    {
-        public string name { get; set; }
-        public string value { get; set; }
-    }
-    
     public class Point
     {
         public int X { get; set; }

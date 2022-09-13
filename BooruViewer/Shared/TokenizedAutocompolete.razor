@@ -3,7 +3,10 @@
 
 @inject GelbooruService GelbooruService
 
-<div class="tokenized-autocomplete search-settings">
+<div class="tokenized-autocomplete">
+    <div>
+        Selected Tags:
+    </div>
     <div class="selected-tags-box">
         <!--Selected Tokens Here-->
         @for (int index = 0; index < SelectedValues.Count; index++)
@@ -17,7 +20,7 @@
         }
     </div>
 
-    <input class="tokenized-search-box" type="text" placeholder="type your search here" @bind="InputValue" @oninput="OnInputChange" />
+    <input type="text" class="tokenized-search-box" placeholder="type your search here" @bind="InputValue" @oninput="OnInputChange"/>
 
     <div class="autocomplete-tags">
         <!--PosibleOptionsHere-->
@@ -39,8 +42,8 @@
     public Action<List<string>> OnTokensChange { get; set; }
 
     public List<string> SelectedValues { get; set; } = new List<string>();
-    public string InputValue { get; set; }
     public List<AutoCompleteCache> AutoSuggestionValues { get; set; } = new List<AutoCompleteCache>();
+    public string InputValue { get; set; }
 
     public async Task OnInputChange(ChangeEventArgs e)
     {

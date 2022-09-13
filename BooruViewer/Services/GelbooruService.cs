@@ -11,6 +11,7 @@ namespace BooruViewer.Services
         public List<Post> Posts { get; private set; }
         public int CurrentPage { get; private set; }
         public bool IsLoadingNextPage { get; private set; }
+        public bool IsLoadingNewSearch { get; private set; }
 
         public async Task OnInitializedAsync()
         {
@@ -63,7 +64,11 @@ namespace BooruViewer.Services
 
             Posts = new List<Post>();
 
+            IsLoadingNewSearch = true;
+
             await LoadPosts();
+
+            IsLoadingNewSearch = false;
         }
 
         public async Task<bool> LoadNextPage() 

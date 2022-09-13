@@ -9,27 +9,25 @@
 
 <div class="navbar sticky">
     <!-- permanent part -->
-    <div class="toggle-nav-bar">
-        <i class="ti ti-menu-2" @onclick="ToggleNavMenu"></i>
-    </div>
     <div class="flex-position-workaround"></div>
+    <div class="toggle-nav-bar" @onclick="ToggleNavMenu">
+        <i class="ti ti-menu-2"></i>
+    </div>
     <!-- sometimes hidden part -->
     <div class="@NavMenuCssClass">
-        <div class="search-settings-box">
-            <!--search-settings-->
-            <TokenizedAutocompolete OnTokensChange="OnSearchChanged"></TokenizedAutocompolete>
-            <div class="search-settings">Rating Placeholder</div>
-            <div class="search-settings">image size placeholder</div>
-        </div>
-        <div>
-            <!--board selector-->
-            <!--maybe local favourites too?-->
-        </div>
+        <!--search-settings-->
+        <TokenizedAutocompolete OnTokensChange="OnSearchChanged"></TokenizedAutocompolete>
+    </div>
+    <div class="@NavMenuCssClass">Rating Placeholder</div>
+    <div class="@NavMenuCssClass">image size placeholder</div>
+    <div class="@NavMenuCssClass">
+        board selector placeholder
+        maybe local favourites too?
     </div>
 </div>
 
 @code {
-    private string NavMenuCssClass { get; set; } = "navbar-content";
+    private string NavMenuCssClass { get; set; } = "search-settings";
 
     private void ToggleNavMenu()
     {
@@ -42,12 +40,10 @@
             NavMenuCssClass += " hidden";
         }
     }
-
-
 }
 
-<div>
-    @if (GelbooruService.LastPostResponse == null)
+<div class="content">
+    @if (GelbooruService.LastPostResponse == null || GelbooruService.IsLoadingNewSearch)
     {
         <h1>Loading...</h1>
     }
@@ -55,17 +51,14 @@
     {
         if (GelbooruService.LastPostResponse.Attributes.Count == 0)
         {
-            <h1>"No Results"</h1>
+            <h1>No Results</h1>
         }
         else
         {
-            <div class="content">
-                @foreach (var item in GelbooruService.Posts)
-                {
-                    <BooruPost Post="@item"></BooruPost>
-                }
-
-            </div>
+            @foreach (var item in GelbooruService.Posts)
+            {
+                <BooruPost Post="@item"></BooruPost>
+            }
             @*
     <div id="pagination">
     <button @onclick="async() => { CurrentPage--; await LoadPosts();}" disabled="@PreviousPageAvailable()">
@@ -90,11 +83,11 @@
 
     private async void OnScroll(int positionX, int currentScrollTopPosition)
     {
-        var currentScrollBottomPosition = currentScrollTopPosition + JavascriptInteropHelper.Height;
+        var currentScrollBottomPosition = currentScrollTopPosition + JavascriptInteropHelper.Size.Y;
         var maxScrollHeight = await JavascriptInteropHelper.GetMaxScrollHeight();
 
         // Phones Are Weird => I don't even know why this works
-        var loadNewPagePosition = maxScrollHeight - (JavascriptInteropHelper.Height);
+        var loadNewPagePosition = maxScrollHeight - (JavascriptInteropHelper.Size.Y);
 
         if (currentScrollBottomPosition < loadNewPagePosition)
         {
@@ -127,7 +120,10 @@
         GelbooruService.GelbooruPostQueryHelper.Tags = tags;
 
         await GelbooruService.NewSearch(GelbooruService.GelbooruPostQueryHelper);
+
         StateHasChanged();
+
+        await JavascriptInteropHelper.SetScroll(new Point() { X = 0, Y = 0, });
     }
 
     public void Dispose()

@@ -37,3 +37,7 @@ function getViewSize() {
 function getMaxScrollHeight() {
     return document.documentElement.scrollHeight;
 }
+
+function setScroll(x, y) {
+    window.scrollTo(x, y);
+}

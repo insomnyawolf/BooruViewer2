@@ -1,9 +1,10 @@
 ﻿:root {
     --background: 0, 0, 0;
-    --accent: 37, 2, 209;
-    --complimentary: 183, 65, 174;
+    --accent: 183, 65, 174;
+    --complimentary: 0, 0, 0;
     --text: 150, 150, 150;
     --size-unit: 375px;
+    --base-font-size: 20px;
 }
 
 * {
@@ -15,6 +16,7 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     background-color: rgba(var(--background), 1);
     color: rgb(var(--text));
+    font-size: var(--base-font-size);
 }
 
 a, .btn-link {
@@ -54,6 +56,20 @@ a, .btn-link {
     width: 100%;
 }
 
+input {
+    color: rgb(var(--text));
+    font-size: var(--base-font-size);
+    border-radius: 4px;
+    background-color: rgba(var(--accent), 0.4);
+    border: 2px solid rgb(var(--complimentary));
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .sticky {
     position: fixed;
 }
@@ -61,33 +77,30 @@ a, .btn-link {
 /* https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
 .navbar {
     width: 100%;
-    background-color: rgba(var(--complimentary), 0.5);
+    background-color: rgba(var(--accent), 0.5);
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
-}
-
-.toggle-nav-bar {
-    order: 2;
-    font-size: xx-large;
+    align-items: stretch;
 }
 
 .flex-position-workaround {
     order: 1;
+    width: 0;
+    height: 0;
 }
 
-.navbar-content {
-    order: 0;
+.toggle-nav-bar {
+    order: 999;
+    font-size: 69px;
+    text-align: center;
+}
+
+.search-settings {
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    /* maybe change to 'space-evenly' */
-    justify-content: flex-start;
-    align-items: stretch;
-    align-content: flex-start;
-    gap: 5px;
+    background-color: rgba(var(--background), 0.75);
+    padding: 6px;
 }
 
 .hidden {
@@ -99,15 +112,15 @@ a, .btn-link {
 }
 
 .content {
-    margin-top: 0px;
     width: 100%;
-    /*    overflow: hidden;*/
+    height: 100vh;
+    margin-top: 0px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    align-items: stretch;
-    align-content: normal;
+    align-items: center;
+    align-content: center;
     row-gap: 5px;
 }
 
@@ -127,23 +140,6 @@ a, .btn-link {
     background-attachment: scroll;
 }
 
-.search-settings-box {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap-reverse;
-    justify-content: flex-start;
-    align-items: stretch;
-    align-content: normal;
-    row-gap: 5px;
-}
-
-.search-settings {
-    width: var(--size-unit);
-    background-color: rgba(0, 0, 0, 0.85);
-    /*placeholder*/
-    min-height: 100px;
-}
-
 .tokenized-autocomplete {
 }
 
@@ -155,17 +151,18 @@ a, .btn-link {
     align-items: start;
     align-content: start;
     row-gap: 5px;
-    height: calc(var(--size-unit) / 3);
+    height: calc(var(--size-unit) / 2);
     overflow-y: auto;
+    margin: 2px;
 }
 
 .chip-accent {
-    background-color: rgba(var(--accent), 0.8);
-    border-radius: 20px;
-    padding: 0.5em;
+    background-color: rgba(var(--accent), 0.6);
+    border-radius: 10px;
+    padding: 0.2em;
 }
 
-.tokenized-search-box{
+.tokenized-search-box {
     width: 100%;
 }
 
@@ -177,13 +174,21 @@ a, .btn-link {
     align-items: start;
     align-content: start;
     row-gap: 5px;
-    height: calc(var(--size-unit) / 3);
+    height: calc(var(--size-unit) / 2);
     overflow-y: auto;
+    margin: 2px;
 }
 
-/*@media (min-width: 641px) {
-    .navbar-toggler {
+@media (max-width: 1124px) {
+    .navbar {
+        flex-direction: column;
+    }
+
+    .toggle-nav-bar {
+        order: -1;
+    }
+
+    .flex-position-workaround {
         display: none;
-    }   
+    }
 }
-*/
