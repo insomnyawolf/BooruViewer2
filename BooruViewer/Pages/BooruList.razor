@@ -1,13 +1,12 @@
 ﻿@page "/"
 @using BooruApi
-@using BooruApi.Models
 @using BooruViewer.Services
 @using BooruViewer.ServicesJs
 
 @inject JavascriptInteropHelper JavascriptInteropHelper
 @inject GelbooruService GelbooruService
 
-<div class="navbar sticky">
+<div class="navbar">
     <!-- permanent part -->
     <div class="flex-position-workaround"></div>
     <div class="toggle-nav-bar" @onclick="ToggleNavMenu">
@@ -16,9 +15,11 @@
     <!-- sometimes hidden part -->
     <div class="@NavMenuCssClass">
         <!--search-settings-->
-        <TokenizedAutocompolete OnTokensChange="OnSearchChanged"></TokenizedAutocompolete>
+        <TokenizedAutocompolete OnTagsChanged="OnTagsChanged"></TokenizedAutocompolete>
     </div>
-    <div class="@NavMenuCssClass">Rating Placeholder</div>
+    <div class="@NavMenuCssClass">
+        <RatingFilter SelectedValue="GelbooruService.GelbooruPostQueryHelper.Rating.PostRating" OnRatingChange="OnRatingChanged"></RatingFilter>
+    </div>
     <div class="@NavMenuCssClass">image size placeholder</div>
     <div class="@NavMenuCssClass">
         board selector placeholder
@@ -40,6 +41,30 @@
             NavMenuCssClass += " hidden";
         }
     }
+
+    private async void OnTagsChanged(List<string> tagsRaw)
+    {
+        var tags = new List<Tag>();
+
+        foreach (var item in tagsRaw)
+        {
+            tags.Add(new Tag()
+                {
+                    Value = item,
+                });
+        }
+
+        GelbooruService.GelbooruPostQueryHelper.Tags = tags;
+
+        await UpdateSearch();
+    }
+
+    public async void OnRatingChanged(GelbooruPostRating Rating)
+    {
+        GelbooruService.GelbooruPostQueryHelper.Rating.PostRating = Rating;
+
+        await UpdateSearch();
+    }
 }
 
 <div class="content">
@@ -59,16 +84,6 @@
             {
                 <BooruPost Post="@item"></BooruPost>
             }
-            @*
-    <div id="pagination">
-    <button @onclick="async() => { CurrentPage--; await LoadPosts();}" disabled="@PreviousPageAvailable()">
-    PreviousPage
-    </button>
-    <button @onclick="async() => { CurrentPage++; await LoadPosts();}" disabled="@NextPageAvailable()">
-    NextPage
-    </button>
-    </div>
-    *@
         }
     }
 </div>
@@ -105,20 +120,8 @@
         StateHasChanged();
     }
 
-    private async void OnSearchChanged(List<string> tagsRaw)
+    public async Task UpdateSearch()
     {
-        var tags = new List<Tag>();
-
-        foreach (var item in tagsRaw)
-        {
-            tags.Add(new Tag()
-                {
-                    Value = item,
-                });
-        }
-
-        GelbooruService.GelbooruPostQueryHelper.Tags = tags;
-
         await GelbooruService.NewSearch(GelbooruService.GelbooruPostQueryHelper);
 
         StateHasChanged();

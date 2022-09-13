@@ -1,5 +1,6 @@
-﻿using BooruApi.Models;
-using BooruApi;
+﻿using BooruApi;
+using BooruApi.Models.Gelbooru;
+using BooruApi.Models.Gelbooru.PostEndpoint;
 
 namespace BooruViewer.Services
 {
@@ -20,10 +21,11 @@ namespace BooruViewer.Services
                 return;
             }
 
-            await NewSearch("");
+            // This is a workaround for search without tags
+            await InitializeSearch("lappland_(arknights)");
         }
 
-        public async Task NewSearch(string tags)
+        public async Task InitializeSearch(string tags)
         {
             var tagsClass = new List<Tag>();
 
@@ -35,7 +37,7 @@ namespace BooruViewer.Services
                 });
             }
 
-            var helper = new GelbooruPostQueryHelper()
+            GelbooruPostQueryHelper = new GelbooruPostQueryHelper()
             {
                 Tags = tagsClass,
                 Limit = 20,
@@ -44,23 +46,25 @@ namespace BooruViewer.Services
                 //{
                 //    Type = SortType.Random,
                 //},
-                Rating = new List<RatingGelbooru>()
+                Rating = new RatingGelbooru()
                 {
-                    new RatingGelbooru()
-                    {
-                        PostRating = GelbooruPostRating.General,
-                        SearchType = SearchType.Include
-                    }
+                    PostRating = GelbooruPostRating.General,
                 },
             };
 
-            await NewSearch(helper);
+            await NewSearch();
         }
 
         public async Task NewSearch(GelbooruPostQueryHelper GelbooruPostQueryHelper)
         {
-            GelbooruPostQueryHelper.Page = 0;
             this.GelbooruPostQueryHelper = GelbooruPostQueryHelper;
+
+            await NewSearch();
+        }
+
+        public async Task NewSearch()
+        {
+            GelbooruPostQueryHelper.Page = 0;
 
             Posts = new List<Post>();
 
@@ -105,6 +109,8 @@ namespace BooruViewer.Services
             // it doesn't let you use network on the main thread
             await Task.Run(async() =>
             {
+                var url = GelbooruPostQueryHelper.ToString();
+
                 LastPostResponse = await GelbooruApi.GetPostsAsync(GelbooruPostQueryHelper);
 
                 Posts.AddRange(LastPostResponse.Posts);

@@ -1,0 +1,76 @@
+﻿@using BooruApi
+@using BooruViewer.Services
+
+@inject GelbooruService GelbooruService
+
+<div>
+    <div>
+        Rating:
+    </div>
+    <select value="@SelectedValue" @onchange="OnInput">
+        @foreach (var rating in Enum.GetValues<GelbooruPostRating>())
+        {
+            <option value="@rating">@rating.ToString()</option>
+        }
+    </select>
+</div>
+
+
+@code {
+    // Demonstrates how a parent component can supply parameters
+    [Parameter]
+    public Action<GelbooruPostRating> OnRatingChange { get; set; }
+
+    [Parameter]
+    public GelbooruPostRating SelectedValue { get; set; }
+
+    public void OnInput(ChangeEventArgs e)
+    {
+        if (e.Value is not string stringValue)
+        {
+            return;
+        }
+
+        if (!Enum.TryParse<GelbooruPostRating>(stringValue, out var value))
+        {
+            return;
+        }
+
+        OnRatingChange?.Invoke(value);
+    }
+
+    //private void OnClick(RatingGelbooru RatingGelbooru)
+    //{
+    //    switch (RatingGelbooru.SearchType)
+    //    {
+    //        case SearchType.Include:
+    //            RatingGelbooru.SearchType = SearchType.Exclude;
+    //            break;
+    //        case SearchType.Exclude:
+    //            RatingGelbooru.SearchType = SearchType.Ignore;
+    //            break;
+    //        case SearchType.Ignore:
+    //            RatingGelbooru.SearchType = SearchType.Include;
+    //            break;
+    //    }
+
+    //    OnChange?.Invoke();
+    //}
+
+    //private string GetVisualValue(SearchType SearchType)
+    //{
+    //    switch (SearchType)
+    //    {
+    //        case SearchType.Include:
+    //            // https://www.compart.com/en/unicode/U+2611
+    //            return "☑";
+    //        case SearchType.Exclude:
+    //            // https://www.compart.com/en/unicode/U+2612
+    //            return "☒";
+    //        case SearchType.Ignore:
+    //        default:
+    //            // https://www.compart.com/en/unicode/U+25A1
+    //            return "□";
+    //    }
+    //}
+}

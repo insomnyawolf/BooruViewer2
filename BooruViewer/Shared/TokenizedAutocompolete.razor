@@ -1,5 +1,4 @@
-﻿@using BooruApi.Models
-@using BooruViewer.Services
+﻿@using BooruViewer.Services
 
 @inject GelbooruService GelbooruService
 
@@ -39,7 +38,7 @@
 @code {
     // Demonstrates how a parent component can supply parameters
     [Parameter]
-    public Action<List<string>> OnTokensChange { get; set; }
+    public Action<List<string>> OnTagsChanged { get; set; }
 
     public List<string> SelectedValues { get; set; } = new List<string>();
     public List<AutoCompleteCache> AutoSuggestionValues { get; set; } = new List<AutoCompleteCache>();
@@ -103,14 +102,14 @@
     {
         SelectedValues.Add(value);
         FilterSuggestions(AutoSuggestionValues);
-        OnTokensChange.Invoke(SelectedValues);
+        OnTagsChanged.Invoke(SelectedValues);
     }
 
     public void RemoveSelected(int index)
     {
         SelectedValues.RemoveAt(index);
         FilterSuggestions(AutoSuggestionValues);
-        OnTokensChange.Invoke(SelectedValues);
+        OnTagsChanged.Invoke(SelectedValues);
     }
 
     public class AutoCompleteCache

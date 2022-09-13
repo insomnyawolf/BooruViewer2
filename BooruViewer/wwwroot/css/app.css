@@ -64,18 +64,10 @@ input {
     border: 2px solid rgb(var(--complimentary));
 }
 
-.center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sticky {
-    position: fixed;
-}
-
 /* https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
 .navbar {
+    position: fixed;
+    top: 0;
     width: 100%;
     background-color: rgba(var(--accent), 0.5);
     display: flex;
@@ -120,7 +112,7 @@ input {
     flex-wrap: wrap;
     justify-content: space-evenly;
     align-items: center;
-    align-content: center;
+    align-content: stretch;
     row-gap: 5px;
 }
 

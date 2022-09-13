@@ -73,7 +73,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BooruApi" Version="0.0.220818.221159" />
+      <PackageReference Include="insomnyawolf.BooruApi" Version="0.0.220913.203956" />
     </ItemGroup>
 
 </Project>
