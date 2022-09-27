@@ -6,6 +6,20 @@
 @inject JavascriptInteropHelper JavascriptInteropHelper
 @inject GelbooruService GelbooruService
 
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        JavascriptInteropHelper.OnScroll += OnScroll;
+        await UpdateSearch();
+    }
+
+    public void Dispose()
+    {
+        JavascriptInteropHelper.OnScroll -= OnScroll;
+    }
+}
+
 <div class="navbar">
     <!-- permanent part -->
     <div class="flex-position-workaround"></div>
@@ -15,10 +29,10 @@
     <!-- sometimes hidden part -->
     <div class="@NavMenuCssClass">
         <!--search-settings-->
-        <TokenizedAutocompolete OnTagsChanged="OnTagsChanged"></TokenizedAutocompolete>
+        <TokenizedAutocompolete SelectedTags="GelbooruPostQueryHelper.Tags" OnTagsChanged="OnTagsChanged"></TokenizedAutocompolete>
     </div>
     <div class="@NavMenuCssClass">
-        <RatingFilter SelectedValue="GelbooruService.GelbooruPostQueryHelper.Rating.PostRating" OnRatingChange="OnRatingChanged"></RatingFilter>
+        <RatingFilter SelectedValue="GelbooruPostQueryHelper.Rating.PostRating" OnRatingChange="OnRatingChanged"></RatingFilter>
     </div>
     <div class="@NavMenuCssClass">image size placeholder</div>
     <div class="@NavMenuCssClass">
@@ -44,31 +58,47 @@
 
     private async void OnTagsChanged(List<string> tagsRaw)
     {
-        var tags = new List<Tag>();
+        var tags = TagsFromStingIEnumerable(tagsRaw);
 
-        foreach (var item in tagsRaw)
-        {
-            tags.Add(new Tag()
-                {
-                    Value = item,
-                });
-        }
-
-        GelbooruService.GelbooruPostQueryHelper.Tags = tags;
+        GelbooruPostQueryHelper.Tags = tags;
 
         await UpdateSearch();
     }
 
     public async void OnRatingChanged(GelbooruPostRating Rating)
     {
-        GelbooruService.GelbooruPostQueryHelper.Rating.PostRating = Rating;
+        GelbooruPostQueryHelper.Rating.PostRating = Rating;
 
         await UpdateSearch();
+    }
+
+    private async void OnScroll(int positionX, int currentScrollTopPosition)
+    {
+        var currentScrollBottomPosition = currentScrollTopPosition + JavascriptInteropHelper.Size.Y;
+        var maxScrollHeight = await JavascriptInteropHelper.GetMaxScrollHeight();
+
+        // Phones Are Weird => I don't even know why this works
+        var loadNewPagePosition = maxScrollHeight - (JavascriptInteropHelper.Size.Y);
+
+        if (currentScrollBottomPosition < loadNewPagePosition)
+        {
+            // Do nothing
+            return;
+        }
+
+        // Validations are made inside
+        if (!await GelbooruService.LoadNextPage(GelbooruPostQueryHelper))
+        {
+            // Does not need ui refreshing
+            return;
+        }
+
+        StateHasChanged();
     }
 }
 
 <div class="content">
-    @if (GelbooruService.LastPostResponse == null || GelbooruService.IsLoadingNewSearch)
+    @if (GelbooruService.LastPostResponse == null || IsLoadingNewSearch)
     {
         <h1>Loading...</h1>
     }
@@ -89,48 +119,59 @@
 </div>
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        JavascriptInteropHelper.OnScroll += OnScroll;
+    private GelbooruPostQueryHelper GelbooruPostQueryHelper { get; set; } = InitializeGelbooruPostQueryHelper("lappland_(arknights)");
 
-        await GelbooruService.OnInitializedAsync();
+    public static GelbooruPostQueryHelper InitializeGelbooruPostQueryHelper(string tagsRaw)
+    {
+        var tags = TagsFromStingIEnumerable(tagsRaw.Split(' '));
+
+        var GelbooruPostQueryHelper = new GelbooruPostQueryHelper()
+        {
+            Tags = tags,
+            Limit = 20,
+            Page = 0,
+            //Sort = new Sort()
+            //{
+            //    Type = SortType.Random,
+            //},
+            Rating = new RatingGelbooru()
+            {
+                PostRating = GelbooruPostRating.General,
+            },
+        };
+
+        return GelbooruPostQueryHelper;
     }
 
-    private async void OnScroll(int positionX, int currentScrollTopPosition)
+    private static List<Tag> TagsFromStingIEnumerable(IEnumerable<string> tagsRaw)
     {
-        var currentScrollBottomPosition = currentScrollTopPosition + JavascriptInteropHelper.Size.Y;
-        var maxScrollHeight = await JavascriptInteropHelper.GetMaxScrollHeight();
+        var tags = new List<Tag>();
 
-        // Phones Are Weird => I don't even know why this works
-        var loadNewPagePosition = maxScrollHeight - (JavascriptInteropHelper.Size.Y);
-
-        if (currentScrollBottomPosition < loadNewPagePosition)
+        foreach (var item in tagsRaw)
         {
-            // Do nothing
-            return;
+            tags.Add(new Tag()
+                {
+                    Value = item,
+                });
         }
 
-        // Validations are made inside
-        if (!await GelbooruService.LoadNextPage())
-        {
-            // Does not need ui refreshing
-            return;
-        }
-
-        StateHasChanged();
+        return tags;
     }
+
+    public bool IsLoadingNewSearch = false;
 
     public async Task UpdateSearch()
     {
-        await GelbooruService.NewSearch(GelbooruService.GelbooruPostQueryHelper);
+        IsLoadingNewSearch = true;
+
+        GelbooruService.ClearLoadedResults();
+
+        await GelbooruService.LoadPosts(GelbooruPostQueryHelper);
+
+        IsLoadingNewSearch = false;
 
         StateHasChanged();
 
         await JavascriptInteropHelper.SetScroll(new Point() { X = 0, Y = 0, });
-    }
-
-    public void Dispose()
-    {
-        JavascriptInteropHelper.OnScroll -= OnScroll;
     }
 }

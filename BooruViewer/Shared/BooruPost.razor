@@ -2,7 +2,7 @@
 @using System.Diagnostics
 @using BooruApi.Models.Gelbooru.PostEndpoint
 
-<div class="post" style="background-image: url(@Post.PreviewUrl);" @onclick="() => OpenInBrowser(Post.FileUrl)">
+<div class="post" style="background-image: url(@Post.PreviewUrl);" @onclick="() => OpenInBrowser(Post.PostUrl)">
     @*<div>
     <div>
     Id: @Post.Id

@@ -1,4 +1,5 @@
-﻿@using BooruViewer.Services
+﻿@using BooruApi
+@using BooruViewer.Services
 
 @inject GelbooruService GelbooruService
 
@@ -39,10 +40,22 @@
     // Demonstrates how a parent component can supply parameters
     [Parameter]
     public Action<List<string>> OnTagsChanged { get; set; }
+    [Parameter]
+    public IEnumerable<Tag> SelectedTags { get; set; }
 
     public List<string> SelectedValues { get; set; } = new List<string>();
     public List<AutoCompleteCache> AutoSuggestionValues { get; set; } = new List<AutoCompleteCache>();
     public string InputValue { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        foreach (var tag in SelectedTags)
+        {
+            AddSelected(tag.Value);
+        }
+    }
 
     public async Task OnInputChange(ChangeEventArgs e)
     {
